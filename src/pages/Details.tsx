@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import TopNavbar from "@/components/TopNavbar";
 import BottomNavBar from "@/components/BottomNavBar";
 import { Button } from "@/components/ui/button";
-import { Heart, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { Heart, Star, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import ImageCarousel from "@/components/ImageCarousel";
 import ReviewList from "@/components/ReviewList";
@@ -23,9 +23,9 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
   const [showCheckout, setShowCheckout] = useState(false);
 
   const token = localStorage.getItem("token");
-
   const backend = "https://travel2-x2et.onrender.com";
 
+  // Redirect if no token
   useEffect(() => {
     if (!token) navigate("/login");
   }, [navigate, token]);
@@ -62,7 +62,9 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
     })
       .then(() => {
         setIsWishlisted(!isWishlisted);
-        toast.success(isWishlisted ? "Removed from wishlist!" : "Added to wishlist!");
+        toast.success(
+          isWishlisted ? "Removed from wishlist!" : "Added to wishlist!"
+        );
       })
       .catch(() => toast.error("Something went wrong"));
   };
@@ -73,6 +75,17 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <TopNavbar theme={theme} toggleTheme={toggleTheme} />
 
+      {/* 🔙 Back Button */}
+      <div className="container max-w-6xl mt-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-sm text-primary hover:underline"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back
+        </button>
+      </div>
+
       <div className="container py-8 max-w-6xl">
         <ImageCarousel images={hotel.images || []} />
 
@@ -81,23 +94,31 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">{hotel.name}</h1>
               <p className="text-lg text-muted-foreground">{hotel.location}</p>
+
               <div className="flex items-center gap-2 mt-3">
                 <div className="flex items-center gap-1">
                   <Star className="w-5 h-5 fill-primary text-primary" />
                   <span className="font-semibold">{hotel.rating || 0}</span>
                 </div>
-                <span className="text-muted-foreground">({hotel.reviewCount} reviews)</span>
+                <span className="text-muted-foreground">
+                  ({hotel.reviewCount} reviews)
+                </span>
               </div>
             </div>
+
             <div className="text-right">
-              <div className="text-3xl font-bold text-primary mb-1">₹{hotel.price}</div>
+              <div className="text-3xl font-bold text-primary mb-1">
+                ₹{hotel.price}
+              </div>
               <div className="text-muted-foreground">per night</div>
             </div>
           </div>
 
           <div className="flex gap-3">
             <Button onClick={handleWishlist} variant="outline" className="gap-2">
-              <Heart className={isWishlisted ? "fill-primary text-primary" : ""} />
+              <Heart
+                className={isWishlisted ? "fill-primary text-primary" : ""}
+              />
               {isWishlisted ? "Saved" : "Save"}
             </Button>
 
@@ -111,8 +132,20 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
             <p className={`text-muted-foreground ${!showMore && "line-clamp-3"}`}>
               {hotel.description}
             </p>
-            <Button variant="link" onClick={() => setShowMore(!showMore)} className="px-0 gap-1">
-              {showMore ? <>Show less <ChevronUp className="w-4 h-4" /></> : <>Show more <ChevronDown className="w-4 h-4" /></>}
+            <Button
+              variant="link"
+              onClick={() => setShowMore(!showMore)}
+              className="px-0 gap-1"
+            >
+              {showMore ? (
+                <>
+                  Show less <ChevronUp className="w-4 h-4" />
+                </>
+              ) : (
+                <>
+                  Show more <ChevronDown className="w-4 h-4" />
+                </>
+              )}
             </Button>
           </div>
 
@@ -135,7 +168,10 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
               <h2 className="text-xl font-semibold mb-3">Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {hotel.amenities.map((amenity: string, i: number) => (
-                  <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-secondary">
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 p-3 rounded-lg bg-secondary"
+                  >
                     <span className="text-sm">{amenity}</span>
                   </div>
                 ))}
@@ -147,7 +183,7 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
         </div>
       </div>
 
-      {/* ✅ CheckoutSheet now receives proper booking object */}
+      {/* Checkout Sheet */}
       <HotelCheckOutSheet
         open={showCheckout}
         onClose={() => setShowCheckout(false)}
@@ -155,7 +191,7 @@ const Details = ({ theme, toggleTheme }: DetailsProps) => {
           id: hotel.id,
           name: hotel.name,
           price: hotel.price,
-          type: "hotel"
+          type: "hotel",
         }}
       />
 
